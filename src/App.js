@@ -1,4 +1,6 @@
 import React from 'react';
+import { Switch, Route } from 'react-router';
+import Login from './pages/Login';
 import logo from './trivia.png';
 import './App.css';
 
@@ -11,6 +13,9 @@ export default function App() {
           SUA VEZ
         </p>
       </header>
+      <Switch>
+        <Route exact path="/" component={ Login } />
+      </Switch>
     </div>
   );
 }
