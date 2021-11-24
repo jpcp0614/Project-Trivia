@@ -3,9 +3,11 @@ import React, { Component } from 'react';
 export default class Login extends Component {
   render() {
     return (
-      <form>
+      <form
+        className="form-login"
+      >
         <label htmlFor="input-player-name">
-          Nome:
+          <span>Nome:</span>
           <input
             data-testid="input-player-name"
             id="input-player-name"
@@ -14,7 +16,7 @@ export default class Login extends Component {
         </label>
 
         <label htmlFor="input-gravatar-email">
-          Email:
+          <span>Email:</span>
           <input
             data-testid="input-gravatar-email"
             id="input-gravatar-email"
