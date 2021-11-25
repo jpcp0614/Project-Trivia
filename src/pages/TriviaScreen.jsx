@@ -7,13 +7,23 @@ export default class TriviaScreen extends Component {
     this.state = {
       triviaQuestions: [],
       questionSelector: 0,
+      isFilled: false,
     };
 
     this.fetchTriviaApi = this.fetchTriviaApi.bind(this);
+    this.checkQuestions = this.checkQuestions.bind(this);
   }
 
   componentDidMount() {
     this.fetchTriviaApi();
+  }
+
+  componentDidUpdate(_prevProps, prevState) {
+    const { triviaQuestions } = this.state;
+
+    if (prevState.triviaQuestions.length !== triviaQuestions.length) {
+      this.checkQuestions();
+    }
   }
 
   async fetchTriviaApi() {
@@ -22,7 +32,6 @@ export default class TriviaScreen extends Component {
     try {
       const response = await fetch(endpoint);
       const { results } = await response.json();
-      console.log(results);
       this.setState({
         triviaQuestions: results,
       });
@@ -31,11 +40,17 @@ export default class TriviaScreen extends Component {
     }
   }
 
-  render() {
-    const { triviaQuestions, questionSelector } = this.state;
-    const triviaSelected = triviaQuestions[questionSelector];
+  checkQuestions() {
+    const { triviaQuestions } = this.state;
     const checkTriviaLenght = triviaQuestions.length !== 0;
-    const falseAnswers = checkTriviaLenght && triviaSelected.incorrect_answers
+
+    if (checkTriviaLenght) this.setState({ isFilled: true });
+  }
+
+  generateAswers() {
+    const { isFilled, questionSelector, triviaQuestions } = this.state;
+    const triviaSelected = triviaQuestions[questionSelector];
+    const falseAnswers = isFilled && triviaSelected.incorrect_answers
       .map((answer, index) => (
         <button
           type="button"
@@ -46,7 +61,8 @@ export default class TriviaScreen extends Component {
           {answer}
         </button>
       ));
-    const questionsAnswers = checkTriviaLenght && [
+
+    const questionsAnswers = isFilled && [
       <button
         type="button"
         key="correct-answer"
@@ -57,21 +73,30 @@ export default class TriviaScreen extends Component {
       </button>,
       ...falseAnswers,
     ];
+
+    return questionsAnswers;
+  }
+
+  render() {
+    const { isFilled, questionSelector, triviaQuestions } = this.state;
+    const triviaSelected = triviaQuestions[questionSelector];
+    const aswers = this.generateAswers();
+
     return (
       <div>
         <h1>Tela de jogo</h1>
         <div className="game-section">
           <div className="question-section">
             <header>
-              {checkTriviaLenght
+              {isFilled
                   && <h3 data-testid="question-category">{triviaSelected.category}</h3>}
             </header>
-            {checkTriviaLenght
+            {isFilled
                 && <p data-testid="question-text">{triviaSelected.question}</p>}
           </div>
           <div className="answers-section" />
-          {checkTriviaLenght
-             && questionsAnswers.map((answer) => answer)}
+          {isFilled
+             && aswers.map((answer) => answer)}
         </div>
       </div>
     );
