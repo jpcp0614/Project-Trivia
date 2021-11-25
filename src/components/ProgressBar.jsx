@@ -1,24 +1,26 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 export default class ProgressBar extends Component {
-  constructor() {
-    super();
-
-    this.state = {
-      timeOut: false,
-    };
-
-    this.startTimer = this.startTimer.bind(this);
+  componentDidMount() {
+    this.startTimer();
   }
 
   startTimer() {
+    const { disableAnswers } = this.props;
     const TOTAL_TIME = 31;
     const INTERVAL = 1000;
     let timer = TOTAL_TIME;
-    setInterval(() => {
+    const countDown = setInterval(() => {
       if (timer === 0) {
+        clearInterval(countDown);
         return;
       }
+
+      if (timer === 1) {
+        disableAnswers();
+      }
+
       timer -= 1;
 
       document.getElementById('counter').innerText = timer;
@@ -27,7 +29,6 @@ export default class ProgressBar extends Component {
   }
 
   render() {
-    this.startTimer();
     return (
       <div>
         <span id="counter" />
@@ -36,3 +37,7 @@ export default class ProgressBar extends Component {
     );
   }
 }
+
+ProgressBar.propTypes = {
+  disableAnswers: PropTypes.func.isRequired,
+};
