@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Header from '../components/Header';
+import ProgressBar from '../components/ProgressBar';
 import '../assets/css/triviaScreen.css';
 
 export default class TriviaScreen extends Component {
@@ -14,7 +15,6 @@ export default class TriviaScreen extends Component {
 
     this.fetchTriviaApi = this.fetchTriviaApi.bind(this);
     this.checkQuestions = this.checkQuestions.bind(this);
-    // this.shuffleAswers = this.shuffleAswers.bind(this);
   }
 
   componentDidMount() {
@@ -127,6 +127,8 @@ export default class TriviaScreen extends Component {
           <div className="answers-section" />
           {isFilled
              && aswers.map((answer) => answer)}
+
+          <ProgressBar />
         </div>
       </div>
     );
