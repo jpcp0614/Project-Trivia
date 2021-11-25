@@ -1,10 +1,11 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-// import { connect } from 'react-redux';
+import { connect } from 'react-redux';
 import logo from '../assets/images/trivia.png';
+import { loginAction } from '../redux/actions';
 import fetchTokenApi from '../services';
 
-export default class Login extends Component {
+class Login extends Component {
   constructor() {
     super();
 
@@ -17,13 +18,16 @@ export default class Login extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.enabledLoginBtn = this.enabledLoginBtn.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleClick = this.handleClick.bind(this);
   }
 
   async handleSubmit(event) {
     event.preventDefault();
-    const { history } = this.props;
+    const { history, sendNameEmail } = this.props;
+    const { name, email } = this.state;
     const token = await fetchTokenApi();
     localStorage.setItem('token', JSON.stringify(token));
+    sendNameEmail(name, email);
     history.push('/game');
   }
 
@@ -45,9 +49,14 @@ export default class Login extends Component {
     }
   }
 
+  handleClick() {
+    const { history } = this.props;
+    history.push('/settings');
+  }
+
   render() {
     const { email, isBtnDisabled, name } = this.state;
-    const { handleChange, handleSubmit } = this;
+    const { handleChange, handleSubmit, handleClick } = this;
     return (
       <div>
         <header className="App-header">
@@ -87,6 +96,9 @@ export default class Login extends Component {
             Jogar
           </button>
         </form>
+        <button type="button" data-testid="btn-settings" onClick={ handleClick }>
+          Configurações
+        </button>
       </div>
 
     );
@@ -97,10 +109,11 @@ Login.propTypes = {
   history: PropTypes.shape({
     push: PropTypes.func.isRequired,
   }).isRequired,
+  sendNameEmail: PropTypes.func.isRequired,
 };
 
-// const mapDispatchToProps = (dispatch) => ({
-//   sendToken: () => dispatch(),
-// });
+const mapDispatchToProps = (dispatch) => ({
+  sendNameEmail: (name, email) => dispatch(loginAction(name, email)),
+});
 
-// export default connect(null, mapDispatchToProps)(Login);
+export default connect(null, mapDispatchToProps)(Login);
