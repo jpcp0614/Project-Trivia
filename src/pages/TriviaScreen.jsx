@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Header from '../components/Header';
 
 export default class TriviaScreen extends Component {
   constructor() {
@@ -103,7 +104,7 @@ export default class TriviaScreen extends Component {
 
     return (
       <div>
-        <h1>Tela de jogo</h1>
+        <Header />
         <div className="game-section">
           <div className="question-section">
             <header>
