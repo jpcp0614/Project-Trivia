@@ -18,6 +18,7 @@ class Login extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.enabledLoginBtn = this.enabledLoginBtn.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleClick = this.handleClick.bind(this);
   }
 
   async handleSubmit(event) {
@@ -48,9 +49,14 @@ class Login extends Component {
     }
   }
 
+  handleClick() {
+    const { history } = this.props;
+    history.push('/settings');
+  }
+
   render() {
     const { email, isBtnDisabled, name } = this.state;
-    const { handleChange, handleSubmit } = this;
+    const { handleChange, handleSubmit, handleClick } = this;
     return (
       <div>
         <header className="App-header">
@@ -90,6 +96,9 @@ class Login extends Component {
             Jogar
           </button>
         </form>
+        <button type="button" data-testid="btn-settings" onClick={ handleClick }>
+          Configurações
+        </button>
       </div>
 
     );
