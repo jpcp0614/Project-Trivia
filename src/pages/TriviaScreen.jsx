@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Header from '../components/Header';
+import '../assets/css/triviaScreen.css';
 
 export default class TriviaScreen extends Component {
   constructor() {
@@ -65,6 +66,13 @@ export default class TriviaScreen extends Component {
     return array;
   }
 
+  handleAnswerClick() {
+    const wrongs = document.querySelectorAll('.wrong');
+    const correct = document.querySelector('.correct');
+    correct.classList.add('correct-answer');
+    wrongs.forEach((wrong) => wrong.classList.add('wrong-answer'));
+  }
+
   generateAswers() {
     const { isFilled, questionSelector, triviaQuestions } = this.state;
     const triviaSelected = triviaQuestions[questionSelector];
@@ -74,7 +82,8 @@ export default class TriviaScreen extends Component {
           type="button"
           key={ `wrong-answer-${index + 1}` }
           data-testid={ `wrong-answer-${index}` }
-          className="wrong-answer answer"
+          className="wrong answer"
+          onClick={ this.handleAnswerClick }
         >
           {answer}
         </button>
@@ -85,7 +94,8 @@ export default class TriviaScreen extends Component {
         type="button"
         key="correct-answer"
         data-testid="correct-answer"
-        className="correct-answer answer"
+        className="correct answer"
+        onClick={ this.handleAnswerClick }
       >
         {triviaSelected.correct_answer}
       </button>,
