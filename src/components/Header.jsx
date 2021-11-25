@@ -1,7 +1,10 @@
+import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 
 class Header extends Component {
   render() {
+    const { name } = this.props;
     return (
       <header>
         <img
@@ -9,11 +12,19 @@ class Header extends Component {
           alt="Foto de perfil do usuário"
           data-testid="header-profile-picture"
         />
-        <em data-testid="header-player-name">nome do usuário</em>
-        <em data-testid="header-score">0</em>
+        <p data-testid="header-player-name">{ name }</p>
+        <p data-testid="header-score">0</p>
       </header>
     );
   }
 }
 
-export default Header;
+Header.propTypes = {
+  name: PropTypes.string.isRequired,
+};
+
+const mapStateToProps = (state) => ({
+  name: state.login.name,
+});
+
+export default connect(mapStateToProps)(Header);
