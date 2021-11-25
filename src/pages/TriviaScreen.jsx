@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import Header from '../components/Header';
+import ProgressBar from '../components/ProgressBar';
+import '../assets/css/triviaScreen.css';
 
 export default class TriviaScreen extends Component {
   constructor() {
@@ -7,13 +9,16 @@ export default class TriviaScreen extends Component {
 
     this.state = {
       triviaQuestions: [],
+      answers: [],
       questionSelector: 0,
       isFilled: false,
+      answersDisabled: false,
     };
 
     this.fetchTriviaApi = this.fetchTriviaApi.bind(this);
     this.checkQuestions = this.checkQuestions.bind(this);
-    // this.shuffleAswers = this.shuffleAswers.bind(this);
+    this.disableAnswers = this.disableAnswers.bind(this);
+    this.changeDisabledBtn = this.changeDisabledBtn.bind(this);
   }
 
   componentDidMount() {
@@ -21,10 +26,14 @@ export default class TriviaScreen extends Component {
   }
 
   componentDidUpdate(_prevProps, prevState) {
-    const { triviaQuestions } = this.state;
+    const { triviaQuestions, answersDisabled } = this.state;
 
     if (prevState.triviaQuestions.length !== triviaQuestions.length) {
       this.checkQuestions();
+    }
+
+    if (prevState.answersDisabled !== answersDisabled) {
+      this.changeDisabledBtn();
     }
   }
 
@@ -46,7 +55,10 @@ export default class TriviaScreen extends Component {
     const { triviaQuestions } = this.state;
     const checkTriviaLenght = triviaQuestions.length !== 0;
 
-    if (checkTriviaLenght) this.setState({ isFilled: true });
+    if (checkTriviaLenght) {
+      this.setState({ isFilled: true });
+      this.generateAswers(true);
+    }
   }
 
   // Função tirada do link https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
@@ -65,27 +77,36 @@ export default class TriviaScreen extends Component {
     return array;
   }
 
-  generateAswers() {
-    const { isFilled, questionSelector, triviaQuestions } = this.state;
+  handleAnswerClick() {
+    const wrongs = document.querySelectorAll('.wrong');
+    const correct = document.querySelector('.correct');
+    correct.classList.add('correct-answer');
+    wrongs.forEach((wrong) => wrong.classList.add('wrong-answer'));
+  }
+
+  generateAswers(checker) {
+    const { questionSelector, triviaQuestions } = this.state;
     const triviaSelected = triviaQuestions[questionSelector];
-    const falseAnswers = isFilled && triviaSelected.incorrect_answers
+    const falseAnswers = checker && triviaSelected.incorrect_answers
       .map((answer, index) => (
         <button
-          type="button"
-          key={ `wrong-answer-${index + 1}` }
+          className="wrong answer"
           data-testid={ `wrong-answer-${index}` }
-          className="wrong-answer answer"
+          key={ `wrong-answer-${index + 1}` }
+          onClick={ this.handleAnswerClick }
+          type="button"
         >
           {answer}
         </button>
       ));
 
-    const questionsAnswers = isFilled && [
+    const questionsAnswers = checker && [
       <button
-        type="button"
-        key="correct-answer"
+        className="correct answer"
         data-testid="correct-answer"
-        className="correct-answer answer"
+        key="correct-answer"
+        onClick={ this.handleAnswerClick }
+        type="button"
       >
         {triviaSelected.correct_answer}
       </button>,
@@ -94,13 +115,21 @@ export default class TriviaScreen extends Component {
 
     const randomAnswer = this.shuffleAswers(questionsAnswers);
 
-    return randomAnswer;
+    this.setState({ answers: randomAnswer });
+  }
+
+  disableAnswers() {
+    this.setState({ answersDisabled: true });
+  }
+
+  changeDisabledBtn() {
+    const allBtns = [...document.querySelectorAll('.answer')];
+    allBtns.forEach((btn) => btn.setAttribute('disabled', 'disabled'));
   }
 
   render() {
-    const { isFilled, questionSelector, triviaQuestions } = this.state;
+    const { isFilled, questionSelector, triviaQuestions, answers } = this.state;
     const triviaSelected = triviaQuestions[questionSelector];
-    const aswers = isFilled ? this.generateAswers() : [];
 
     return (
       <div>
@@ -116,7 +145,11 @@ export default class TriviaScreen extends Component {
           </div>
           <div className="answers-section" />
           {isFilled
-             && aswers.map((answer) => answer)}
+             && answers.map((answer) => answer)}
+
+          <ProgressBar
+            disableAnswers={ this.disableAnswers }
+          />
         </div>
       </div>
     );
