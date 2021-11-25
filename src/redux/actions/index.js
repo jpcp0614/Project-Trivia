@@ -4,9 +4,12 @@ export const LOGIN = 'LOGIN';
 
 // export const ERROR = 'ERROR';
 
-export const loginAction = (payload) => ({
+export const loginAction = (name, email) => ({
   type: LOGIN,
-  payload,
+  payload: {
+    name,
+    email,
+  },
 });
 
 // export const successActionApi = () => ({
