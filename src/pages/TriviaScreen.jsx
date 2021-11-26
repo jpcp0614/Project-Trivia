@@ -4,6 +4,7 @@ import Header from '../components/Header';
 import ProgressBar from '../components/ProgressBar';
 import setInitialPlayer from '../helpers/setInitialPlayer';
 import setPlayerInfoFunc from '../helpers/setPlayerInfo';
+import fetchTriviaApiFunc from '../helpers/fetchTriviaApi';
 import '../assets/css/triviaScreen.css';
 
 class TriviaScreen extends Component {
@@ -18,7 +19,7 @@ class TriviaScreen extends Component {
       assertions: 0,
       score: 0,
     };
-    this.fetchTriviaApi = this.fetchTriviaApi.bind(this);
+    this.fetchTriviaApi = fetchTriviaApiFunc.bind(this);
     this.checkQuestions = this.checkQuestions.bind(this);
     this.disableAnswers = this.disableAnswers.bind(this);
     this.changeDisabledBtn = this.changeDisabledBtn.bind(this);
@@ -48,19 +49,19 @@ class TriviaScreen extends Component {
     }
   }
 
-  async fetchTriviaApi() {
-    const token = JSON.parse(localStorage.getItem('token'));
-    const endpoint = `https://opentdb.com/api.php?amount=5&token=${token}`;
-    try {
-      const response = await fetch(endpoint);
-      const { results } = await response.json();
-      this.setState({
-        triviaQuestions: results,
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  // async fetchTriviaApi() {
+  //   const token = JSON.parse(localStorage.getItem('token'));
+  //   const endpoint = `https://opentdb.com/api.php?amount=5&token=${token}`;
+  //   try {
+  //     const response = await fetch(endpoint);
+  //     const { results } = await response.json();
+  //     this.setState({
+  //       triviaQuestions: results,
+  //     });
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // }
 
   checkQuestions() {
     const { triviaQuestions } = this.state;
