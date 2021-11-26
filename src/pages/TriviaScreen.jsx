@@ -25,6 +25,7 @@ class TriviaScreen extends Component {
     this.changeDisabledBtn = this.changeDisabledBtn.bind(this);
     this.incorrectOrCorrect = this.incorrectOrCorrect.bind(this);
     this.setPlayerInfo = this.setPlayerInfo.bind(this);
+    this.handleBtnNxt = this.handleBtnNxt.bind(this);
   }
 
   componentDidMount() {
@@ -118,9 +119,18 @@ class TriviaScreen extends Component {
   handleAnswerClick(event) {
     const wrongs = document.querySelectorAll('.wrong');
     const correct = document.querySelector('.correct');
+    const btnNext = document.querySelector('.btn-next');
+    btnNext.removeAttribute('hidden');
     correct.classList.add('correct-answer');
     wrongs.forEach((wrong) => wrong.classList.add('wrong-answer'));
     this.incorrectOrCorrect(event);
+  }
+
+  handleBtnNxt() {
+    const { questionSelector } = this.state;
+    this.setState({
+      questionSelector: questionSelector + 1,
+    });
   }
 
   incorrectOrCorrect({ target: { className } }) {
@@ -211,6 +221,15 @@ class TriviaScreen extends Component {
           <ProgressBar
             disableAnswers={ this.disableAnswers }
           />
+          <button
+            className="btn-next"
+            data-testid="btn-next"
+            hidden="true"
+            type="button"
+            onClick={ this.handleBtnNxt }
+          >
+            Próxima
+          </button>
         </div>
       </div>
     );
