@@ -10,6 +10,7 @@ import generateAnswersFunc from '../helpers/generateAnswers';
 import changeDisabledBtnFunc from '../helpers/changeDisabledBtn';
 import handleAnswerClickFunc from '../helpers/handleAnswerClick';
 import handleBtnNxtFunc from '../helpers/handleBtnNxt';
+import incorrectOrCorrectFunc from '../helpers/incorrectOrCorrect';
 import '../assets/css/triviaScreen.css';
 
 class TriviaScreen extends Component {
@@ -22,7 +23,6 @@ class TriviaScreen extends Component {
       isFilled: false,
       answersDisabled: false,
       assertions: 0,
-      score: 0,
     };
 
     this.fetchTriviaApi = fetchTriviaApiFunc.bind(this);
@@ -32,8 +32,8 @@ class TriviaScreen extends Component {
     this.setPlayerInfo = setPlayerInfoFunc.bind(this);
     this.handleAnswerClick = handleAnswerClickFunc.bind(this);
     this.handleBtnNxt = handleBtnNxtFunc.bind(this);
+    this.incorrectOrCorrect = incorrectOrCorrectFunc.bind(this);
     this.disableAnswers = this.disableAnswers.bind(this);
-    this.incorrectOrCorrect = this.incorrectOrCorrect.bind(this);
   }
 
   componentDidMount() {
@@ -54,28 +54,6 @@ class TriviaScreen extends Component {
 
     if (prevState.assertions !== assertions) {
       this.setPlayerInfo();
-    }
-  }
-
-  incorrectOrCorrect({ target: { className } }) {
-    const NUMBER_TEN = 10;
-    const { triviaQuestions, questionSelector } = this.state;
-    const { difficulty } = triviaQuestions[questionSelector];
-    const timeLeft = Number(document.getElementById('counter').innerText);
-
-    const valueDifficulty = {
-      easy: 1,
-      medium: 2,
-      hard: 3,
-    };
-
-    const correctAnswerValue = NUMBER_TEN + (timeLeft * valueDifficulty[difficulty]);
-
-    if (className.includes('correct answer')) {
-      this.setState((prevState) => ({
-        assertions: prevState.assertions + 1,
-        score: prevState.score + correctAnswerValue,
-      }));
     }
   }
 
