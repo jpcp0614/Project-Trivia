@@ -91,16 +91,16 @@ class TriviaScreen extends Component {
 
   checkQuestions() {
     const { triviaQuestions } = this.state;
-    const checkTriviaLenght = triviaQuestions.length !== 0;
+    const checkTriviaLength = triviaQuestions.length !== 0;
 
-    if (checkTriviaLenght) {
+    if (checkTriviaLength) {
       this.setState({ isFilled: true });
-      this.generateAswers(true);
+      this.generateAnswers(true);
     }
   }
 
   // Função tirada do link https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
-  shuffleAswers(array) {
+  shuffleAnswers(array) {
     let currentIndex = array.length;
     let randomIndex = 0;
 
@@ -145,7 +145,7 @@ class TriviaScreen extends Component {
     }
   }
 
-  generateAswers(checker) {
+  generateAnswers(checker) {
     const { questionSelector, triviaQuestions } = this.state;
     const triviaSelected = triviaQuestions[questionSelector];
     const falseAnswers = checker && triviaSelected.incorrect_answers
@@ -174,7 +174,7 @@ class TriviaScreen extends Component {
       ...falseAnswers,
     ];
 
-    const randomAnswer = this.shuffleAswers(questionsAnswers);
+    const randomAnswer = this.shuffleAnswers(questionsAnswers);
 
     this.setState({ answers: randomAnswer });
   }
