@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Header from '../components/Header';
 import ProgressBar from '../components/ProgressBar';
 import setInitialPlayer from '../helpers/setInitialPlayer';
+import setPlayerInfoFunc from '../helpers/setPlayerInfo';
 import '../assets/css/triviaScreen.css';
 
 class TriviaScreen extends Component {
@@ -23,7 +23,7 @@ class TriviaScreen extends Component {
     this.disableAnswers = this.disableAnswers.bind(this);
     this.changeDisabledBtn = this.changeDisabledBtn.bind(this);
     this.incorrectOrCorrect = this.incorrectOrCorrect.bind(this);
-    this.setPlayerInfo = this.setPlayerInfo.bind(this);
+    this.setPlayerInfo = setPlayerInfoFunc.bind(this);
     this.handleBtnNxt = this.handleBtnNxt.bind(this);
   }
 
@@ -46,21 +46,6 @@ class TriviaScreen extends Component {
     if (prevState.assertions !== assertions) {
       this.setPlayerInfo();
     }
-  }
-
-  setPlayerInfo() {
-    const { assertions, score } = this.state;
-    const { name, email } = this.props;
-    console.log(name, email);
-    const state = {
-      player: {
-        name,
-        assertions,
-        score,
-        gravatarEmail: email,
-      },
-    };
-    localStorage.setItem('state', JSON.stringify(state));
   }
 
   async fetchTriviaApi() {
@@ -225,11 +210,6 @@ class TriviaScreen extends Component {
     );
   }
 }
-
-TriviaScreen.propTypes = {
-  email: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-};
 
 const mapStateToProps = (state) => ({
   name: state.login.name,
