@@ -1,9 +1,11 @@
+import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import Header from '../components/Header';
 import ProgressBar from '../components/ProgressBar';
 import '../assets/css/triviaScreen.css';
 
-export default class TriviaScreen extends Component {
+class TriviaScreen extends Component {
   constructor() {
     super();
 
@@ -13,20 +15,25 @@ export default class TriviaScreen extends Component {
       questionSelector: 0,
       isFilled: false,
       answersDisabled: false,
+      assertions: 0,
+      score: 0,
     };
 
     this.fetchTriviaApi = this.fetchTriviaApi.bind(this);
     this.checkQuestions = this.checkQuestions.bind(this);
     this.disableAnswers = this.disableAnswers.bind(this);
     this.changeDisabledBtn = this.changeDisabledBtn.bind(this);
+    this.incorrectOrCorrect = this.incorrectOrCorrect.bind(this);
+    this.setPlayerInfo = this.setPlayerInfo.bind(this);
   }
 
   componentDidMount() {
     this.fetchTriviaApi();
+    this.setInitialPlayer();
   }
 
   componentDidUpdate(_prevProps, prevState) {
-    const { triviaQuestions, answersDisabled } = this.state;
+    const { triviaQuestions, answersDisabled, assertions } = this.state;
 
     if (prevState.triviaQuestions.length !== triviaQuestions.length) {
       this.checkQuestions();
@@ -35,6 +42,37 @@ export default class TriviaScreen extends Component {
     if (prevState.answersDisabled !== answersDisabled) {
       this.changeDisabledBtn();
     }
+
+    if (prevState.assertions !== assertions) {
+      this.setPlayerInfo();
+    }
+  }
+
+  setInitialPlayer() {
+    const state = {
+      player: {
+        name: '',
+        assertions: 0,
+        score: 0,
+        gravatarEmail: '',
+      },
+    };
+    localStorage.setItem('state', JSON.stringify(state));
+  }
+
+  setPlayerInfo() {
+    const { assertions, score } = this.state;
+    const { name, email } = this.props;
+    console.log(name, email);
+    const state = {
+      player: {
+        name,
+        assertions,
+        score,
+        gravatarEmail: email,
+      },
+    };
+    localStorage.setItem('state', JSON.stringify(state));
   }
 
   async fetchTriviaApi() {
@@ -77,11 +115,34 @@ export default class TriviaScreen extends Component {
     return array;
   }
 
-  handleAnswerClick() {
+  handleAnswerClick(event) {
     const wrongs = document.querySelectorAll('.wrong');
     const correct = document.querySelector('.correct');
     correct.classList.add('correct-answer');
     wrongs.forEach((wrong) => wrong.classList.add('wrong-answer'));
+    this.incorrectOrCorrect(event);
+  }
+
+  incorrectOrCorrect({ target: { className } }) {
+    const NUMBER_TEN = 10;
+    const { triviaQuestions, questionSelector } = this.state;
+    const { difficulty } = triviaQuestions[questionSelector];
+    const timeLeft = Number(document.getElementById('counter').innerText);
+
+    const valueDifficulty = {
+      easy: 1,
+      medium: 2,
+      hard: 3,
+    };
+
+    const correctAnswerValue = NUMBER_TEN + (timeLeft * valueDifficulty[difficulty]);
+
+    if (className.includes('correct answer')) {
+      this.setState((prevState) => ({
+        assertions: prevState.assertions + 1,
+        score: prevState.score + correctAnswerValue,
+      }));
+    }
   }
 
   generateAswers(checker) {
@@ -93,7 +154,7 @@ export default class TriviaScreen extends Component {
           className="wrong answer"
           data-testid={ `wrong-answer-${index}` }
           key={ `wrong-answer-${index + 1}` }
-          onClick={ this.handleAnswerClick }
+          onClick={ (event) => this.handleAnswerClick(event) }
           type="button"
         >
           {answer}
@@ -105,7 +166,7 @@ export default class TriviaScreen extends Component {
         className="correct answer"
         data-testid="correct-answer"
         key="correct-answer"
-        onClick={ this.handleAnswerClick }
+        onClick={ (event) => this.handleAnswerClick(event) }
         type="button"
       >
         {triviaSelected.correct_answer}
@@ -145,7 +206,7 @@ export default class TriviaScreen extends Component {
           </div>
           <div className="answers-section" />
           {isFilled
-             && answers.map((answer) => answer)}
+            && answers.map((answer) => answer)}
 
           <ProgressBar
             disableAnswers={ this.disableAnswers }
@@ -155,3 +216,15 @@ export default class TriviaScreen extends Component {
     );
   }
 }
+
+TriviaScreen.propTypes = {
+  email: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+};
+
+const mapStateToProps = (state) => ({
+  name: state.login.name,
+  email: state.login.email,
+});
+
+export default connect(mapStateToProps)(TriviaScreen);
