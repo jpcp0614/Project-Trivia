@@ -1,14 +1,22 @@
-import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Header from '../components/Header';
 import ProgressBar from '../components/ProgressBar';
+import setInitialPlayer from '../helpers/setInitialPlayer';
+import setPlayerInfoFunc from '../helpers/setPlayerInfo';
+import fetchTriviaApiFunc from '../helpers/fetchTriviaApi';
+import checkQuestionsFunc from '../helpers/checkQuestions';
+import generateAnswersFunc from '../helpers/generateAnswers';
+import changeDisabledBtnFunc from '../helpers/changeDisabledBtn';
+import handleAnswerClickFunc from '../helpers/handleAnswerClick';
+import handleBtnNxtFunc from '../helpers/handleBtnNxt';
+import incorrectOrCorrectFunc from '../helpers/incorrectOrCorrect';
+import disableAnswersFunc from '../helpers/disableAnswers';
 import '../assets/css/triviaScreen.css';
 
 class TriviaScreen extends Component {
   constructor() {
     super();
-
     this.state = {
       triviaQuestions: [],
       answers: [],
@@ -16,27 +24,29 @@ class TriviaScreen extends Component {
       isFilled: false,
       answersDisabled: false,
       assertions: 0,
-      score: 0,
     };
 
-    this.fetchTriviaApi = this.fetchTriviaApi.bind(this);
-    this.checkQuestions = this.checkQuestions.bind(this);
-    this.disableAnswers = this.disableAnswers.bind(this);
-    this.changeDisabledBtn = this.changeDisabledBtn.bind(this);
-    this.incorrectOrCorrect = this.incorrectOrCorrect.bind(this);
-    this.setPlayerInfo = this.setPlayerInfo.bind(this);
+    this.fetchTriviaApi = fetchTriviaApiFunc.bind(this);
+    this.checkQuestions = checkQuestionsFunc.bind(this);
+    this.generateAnswers = generateAnswersFunc.bind(this);
+    this.changeDisabledBtn = changeDisabledBtnFunc.bind(this);
+    this.setPlayerInfo = setPlayerInfoFunc.bind(this);
+    this.handleAnswerClick = handleAnswerClickFunc.bind(this);
+    this.handleBtnNxt = handleBtnNxtFunc.bind(this);
+    this.incorrectOrCorrect = incorrectOrCorrectFunc.bind(this);
+    this.disableAnswers = disableAnswersFunc.bind(this);
   }
 
   componentDidMount() {
     this.fetchTriviaApi();
-    this.setInitialPlayer();
+    setInitialPlayer();
   }
 
   componentDidUpdate(_prevProps, prevState) {
     const { triviaQuestions, answersDisabled, assertions } = this.state;
 
     if (prevState.triviaQuestions.length !== triviaQuestions.length) {
-      this.checkQuestions();
+      this.checkQuestions(this.generateAnswers);
     }
 
     if (prevState.answersDisabled !== answersDisabled) {
@@ -48,148 +58,9 @@ class TriviaScreen extends Component {
     }
   }
 
-  setInitialPlayer() {
-    const state = {
-      player: {
-        name: '',
-        assertions: 0,
-        score: 0,
-        gravatarEmail: '',
-      },
-    };
-    localStorage.setItem('state', JSON.stringify(state));
-  }
-
-  setPlayerInfo() {
-    const { assertions, score } = this.state;
-    const { name, email } = this.props;
-    console.log(name, email);
-    const state = {
-      player: {
-        name,
-        assertions,
-        score,
-        gravatarEmail: email,
-      },
-    };
-    localStorage.setItem('state', JSON.stringify(state));
-  }
-
-  async fetchTriviaApi() {
-    const token = JSON.parse(localStorage.getItem('token'));
-    const endpoint = `https://opentdb.com/api.php?amount=5&token=${token}`;
-    try {
-      const response = await fetch(endpoint);
-      const { results } = await response.json();
-      this.setState({
-        triviaQuestions: results,
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  checkQuestions() {
-    const { triviaQuestions } = this.state;
-    const checkTriviaLength = triviaQuestions.length !== 0;
-
-    if (checkTriviaLength) {
-      this.setState({ isFilled: true });
-      this.generateAnswers(true);
-    }
-  }
-
-  // Função tirada do link https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
-  shuffleAnswers(array) {
-    let currentIndex = array.length;
-    let randomIndex = 0;
-
-    while (currentIndex !== 0) {
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex -= 1;
-
-      [array[currentIndex], array[randomIndex]] = [
-        array[randomIndex], array[currentIndex]];
-    }
-
-    return array;
-  }
-
-  handleAnswerClick(event) {
-    const wrongs = document.querySelectorAll('.wrong');
-    const correct = document.querySelector('.correct');
-    correct.classList.add('correct-answer');
-    wrongs.forEach((wrong) => wrong.classList.add('wrong-answer'));
-    this.incorrectOrCorrect(event);
-  }
-
-  incorrectOrCorrect({ target: { className } }) {
-    const NUMBER_TEN = 10;
-    const { triviaQuestions, questionSelector } = this.state;
-    const { difficulty } = triviaQuestions[questionSelector];
-    const timeLeft = Number(document.getElementById('counter').innerText);
-
-    const valueDifficulty = {
-      easy: 1,
-      medium: 2,
-      hard: 3,
-    };
-
-    const correctAnswerValue = NUMBER_TEN + (timeLeft * valueDifficulty[difficulty]);
-
-    if (className.includes('correct answer')) {
-      this.setState((prevState) => ({
-        assertions: prevState.assertions + 1,
-        score: prevState.score + correctAnswerValue,
-      }));
-    }
-  }
-
-  generateAnswers(checker) {
-    const { questionSelector, triviaQuestions } = this.state;
-    const triviaSelected = triviaQuestions[questionSelector];
-    const falseAnswers = checker && triviaSelected.incorrect_answers
-      .map((answer, index) => (
-        <button
-          className="wrong answer"
-          data-testid={ `wrong-answer-${index}` }
-          key={ `wrong-answer-${index + 1}` }
-          onClick={ (event) => this.handleAnswerClick(event) }
-          type="button"
-        >
-          {answer}
-        </button>
-      ));
-
-    const questionsAnswers = checker && [
-      <button
-        className="correct answer"
-        data-testid="correct-answer"
-        key="correct-answer"
-        onClick={ (event) => this.handleAnswerClick(event) }
-        type="button"
-      >
-        {triviaSelected.correct_answer}
-      </button>,
-      ...falseAnswers,
-    ];
-
-    const randomAnswer = this.shuffleAnswers(questionsAnswers);
-
-    this.setState({ answers: randomAnswer });
-  }
-
-  disableAnswers() {
-    this.setState({ answersDisabled: true });
-  }
-
-  changeDisabledBtn() {
-    const allBtns = [...document.querySelectorAll('.answer')];
-    allBtns.forEach((btn) => btn.setAttribute('disabled', 'disabled'));
-  }
-
   render() {
     const { isFilled, questionSelector, triviaQuestions, answers } = this.state;
+    const answerSelected = answers[questionSelector];
     const triviaSelected = triviaQuestions[questionSelector];
 
     return (
@@ -206,21 +77,25 @@ class TriviaScreen extends Component {
           </div>
           <div className="answers-section" />
           {isFilled
-            && answers.map((answer) => answer)}
+            && answerSelected.map((answer) => answer)}
 
           <ProgressBar
             disableAnswers={ this.disableAnswers }
           />
+          <button
+            className="btn-next"
+            data-testid="btn-next"
+            hidden
+            type="button"
+            onClick={ this.handleBtnNxt }
+          >
+            Próxima
+          </button>
         </div>
       </div>
     );
   }
 }
-
-TriviaScreen.propTypes = {
-  email: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-};
 
 const mapStateToProps = (state) => ({
   name: state.login.name,

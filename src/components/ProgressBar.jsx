@@ -23,8 +23,12 @@ export default class ProgressBar extends Component {
 
       timer -= 1;
 
-      document.getElementById('counter').innerText = timer;
-      document.getElementById('progressBar').value = timer;
+      if (document.getElementById('counter')) {
+        document.getElementById('counter').innerText = timer;
+      }
+      if (document.getElementById('progressBar')) {
+        document.getElementById('progressBar').value = timer;
+      }
     }, INTERVAL);
   }
 
