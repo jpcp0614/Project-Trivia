@@ -200,7 +200,7 @@ class TriviaScreen extends Component {
           <button
             className="btn-next"
             data-testid="btn-next"
-            hidden="true"
+            hidden
             type="button"
             onClick={ this.handleBtnNxt }
           >
