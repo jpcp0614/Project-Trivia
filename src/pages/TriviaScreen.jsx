@@ -11,6 +11,7 @@ import changeDisabledBtnFunc from '../helpers/changeDisabledBtn';
 import handleAnswerClickFunc from '../helpers/handleAnswerClick';
 import handleBtnNxtFunc from '../helpers/handleBtnNxt';
 import incorrectOrCorrectFunc from '../helpers/incorrectOrCorrect';
+import disableAnswersFunc from '../helpers/disableAnswers';
 import '../assets/css/triviaScreen.css';
 
 class TriviaScreen extends Component {
@@ -33,7 +34,7 @@ class TriviaScreen extends Component {
     this.handleAnswerClick = handleAnswerClickFunc.bind(this);
     this.handleBtnNxt = handleBtnNxtFunc.bind(this);
     this.incorrectOrCorrect = incorrectOrCorrectFunc.bind(this);
-    this.disableAnswers = this.disableAnswers.bind(this);
+    this.disableAnswers = disableAnswersFunc.bind(this);
   }
 
   componentDidMount() {
@@ -55,10 +56,6 @@ class TriviaScreen extends Component {
     if (prevState.assertions !== assertions) {
       this.setPlayerInfo();
     }
-  }
-
-  disableAnswers() {
-    this.setState({ answersDisabled: true });
   }
 
   render() {
