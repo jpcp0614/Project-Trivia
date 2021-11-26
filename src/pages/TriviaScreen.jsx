@@ -6,6 +6,7 @@ import setInitialPlayer from '../helpers/setInitialPlayer';
 import setPlayerInfoFunc from '../helpers/setPlayerInfo';
 import fetchTriviaApiFunc from '../helpers/fetchTriviaApi';
 import checkQuestionsFunc from '../helpers/checkQuestions';
+import generateAnswersFunc from '../helpers/generateAnswers';
 import '../assets/css/triviaScreen.css';
 
 class TriviaScreen extends Component {
@@ -20,8 +21,10 @@ class TriviaScreen extends Component {
       assertions: 0,
       score: 0,
     };
+
     this.fetchTriviaApi = fetchTriviaApiFunc.bind(this);
     this.checkQuestions = checkQuestionsFunc.bind(this);
+    this.generateAnswers = generateAnswersFunc.bind(this);
     this.disableAnswers = this.disableAnswers.bind(this);
     this.changeDisabledBtn = this.changeDisabledBtn.bind(this);
     this.incorrectOrCorrect = this.incorrectOrCorrect.bind(this);
@@ -38,7 +41,7 @@ class TriviaScreen extends Component {
     const { triviaQuestions, answersDisabled, assertions } = this.state;
 
     if (prevState.triviaQuestions.length !== triviaQuestions.length) {
-      this.checkQuestions();
+      this.checkQuestions(this.generateAnswers);
     }
 
     if (prevState.answersDisabled !== answersDisabled) {
@@ -51,20 +54,20 @@ class TriviaScreen extends Component {
   }
 
   // Função tirada do link https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
-  shuffleAnswers(array) {
-    let currentIndex = array.length;
-    let randomIndex = 0;
+  // shuffleAnswers(array) {
+  //   let currentIndex = array.length;
+  //   let randomIndex = 0;
 
-    while (currentIndex !== 0) {
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex -= 1;
+  //   while (currentIndex !== 0) {
+  //     randomIndex = Math.floor(Math.random() * currentIndex);
+  //     currentIndex -= 1;
 
-      [array[currentIndex], array[randomIndex]] = [
-        array[randomIndex], array[currentIndex]];
-    }
+  //     [array[currentIndex], array[randomIndex]] = [
+  //       array[randomIndex], array[currentIndex]];
+  //   }
 
-    return array;
-  }
+  //   return array;
+  // }
 
   handleAnswerClick(event) {
     const wrongs = document.querySelectorAll('.wrong');
@@ -105,41 +108,41 @@ class TriviaScreen extends Component {
     }
   }
 
-  generateAnswers(checker) {
-    const { triviaQuestions } = this.state;
-    const triviaAnswers = [];
-    triviaQuestions.forEach((triviaSelected) => {
-      const falseAnswers = checker && triviaSelected.incorrect_answers
-        .map((answer, index) => (
-          <button
-            className="wrong answer"
-            data-testid={ `wrong-answer-${index}` }
-            key={ `wrong-answer-${index + 1}` }
-            onClick={ (event) => this.handleAnswerClick(event) }
-            type="button"
-          >
-            {answer}
-          </button>
-        ));
+  // generateAnswers(checker) {
+  //   const { triviaQuestions } = this.state;
+  //   const triviaAnswers = [];
+  //   triviaQuestions.forEach((triviaSelected) => {
+  //     const falseAnswers = checker && triviaSelected.incorrect_answers
+  //       .map((answer, index) => (
+  //         <button
+  //           className="wrong answer"
+  //           data-testid={ `wrong-answer-${index}` }
+  //           key={ `wrong-answer-${index + 1}` }
+  //           onClick={ (event) => this.handleAnswerClick(event) }
+  //           type="button"
+  //         >
+  //           {answer}
+  //         </button>
+  //       ));
 
-      const questionsAnswers = checker && [
-        <button
-          className="correct answer"
-          data-testid="correct-answer"
-          key="correct-answer"
-          onClick={ (event) => this.handleAnswerClick(event) }
-          type="button"
-        >
-          {triviaSelected.correct_answer}
-        </button>,
-        ...falseAnswers,
-      ];
+  //     const questionsAnswers = checker && [
+  //       <button
+  //         className="correct answer"
+  //         data-testid="correct-answer"
+  //         key="correct-answer"
+  //         onClick={ (event) => this.handleAnswerClick(event) }
+  //         type="button"
+  //       >
+  //         {triviaSelected.correct_answer}
+  //       </button>,
+  //       ...falseAnswers,
+  //     ];
 
-      const randomAnswer = this.shuffleAnswers(questionsAnswers);
-      triviaAnswers.push(randomAnswer);
-    });
-    this.setState({ answers: triviaAnswers });
-  }
+  //     const randomAnswer = this.shuffleAnswers(questionsAnswers);
+  //     triviaAnswers.push(randomAnswer);
+  //   });
+  //   this.setState({ answers: triviaAnswers });
+  // }
 
   disableAnswers() {
     this.setState({ answersDisabled: true });
