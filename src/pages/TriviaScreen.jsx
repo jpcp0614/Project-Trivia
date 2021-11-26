@@ -8,6 +8,7 @@ import fetchTriviaApiFunc from '../helpers/fetchTriviaApi';
 import checkQuestionsFunc from '../helpers/checkQuestions';
 import generateAnswersFunc from '../helpers/generateAnswers';
 import changeDisabledBtnFunc from '../helpers/changeDisabledBtn';
+import handleAnswerClickFunc from '../helpers/handleAnswerClick';
 import '../assets/css/triviaScreen.css';
 
 class TriviaScreen extends Component {
@@ -28,6 +29,7 @@ class TriviaScreen extends Component {
     this.generateAnswers = generateAnswersFunc.bind(this);
     this.changeDisabledBtn = changeDisabledBtnFunc.bind(this);
     this.setPlayerInfo = setPlayerInfoFunc.bind(this);
+    this.handleAnswerClick = handleAnswerClickFunc.bind(this);
     this.disableAnswers = this.disableAnswers.bind(this);
     this.incorrectOrCorrect = this.incorrectOrCorrect.bind(this);
     this.handleBtnNxt = this.handleBtnNxt.bind(this);
@@ -52,16 +54,6 @@ class TriviaScreen extends Component {
     if (prevState.assertions !== assertions) {
       this.setPlayerInfo();
     }
-  }
-
-  handleAnswerClick(event) {
-    const wrongs = document.querySelectorAll('.wrong');
-    const correct = document.querySelector('.correct');
-    const btnNext = document.querySelector('.btn-next');
-    btnNext.removeAttribute('hidden');
-    correct.classList.add('correct-answer');
-    wrongs.forEach((wrong) => wrong.classList.add('wrong-answer'));
-    this.incorrectOrCorrect(event);
   }
 
   handleBtnNxt() {
@@ -96,11 +88,6 @@ class TriviaScreen extends Component {
   disableAnswers() {
     this.setState({ answersDisabled: true });
   }
-
-  // changeDisabledBtn() {
-  //   const allBtns = [...document.querySelectorAll('.answer')];
-  //   allBtns.forEach((btn) => btn.setAttribute('disabled', 'disabled'));
-  // }
 
   render() {
     const { isFilled, questionSelector, triviaQuestions, answers } = this.state;
