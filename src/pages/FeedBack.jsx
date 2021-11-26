@@ -15,6 +15,7 @@ class FeedBack extends Component {
     this.fetchGravatarApi = this.fetchGravatarApi.bind(this);
     this.getPlayer = this.getPlayer.bind(this);
     this.messageAssertion = this.messageAssertion.bind(this);
+    this.handleClick = this.handleClick.bind(this);
   }
 
   componentDidMount() {
@@ -52,6 +53,11 @@ class FeedBack extends Component {
     });
   }
 
+  handleClick() {
+    const { history } = this.props;
+    history.push('/');
+  }
+
   render() {
     const { name } = this.props;
     const { getHash, score, message, assertions } = this.state;
@@ -72,6 +78,13 @@ class FeedBack extends Component {
           <p data-testid="feedback-total-score">{ score }</p>
           <p data-testid="feedback-total-question">{ assertions }</p>
         </section>
+        <button
+          type="button"
+          data-testid="btn-play-again"
+          onClick={ this.handleClick }
+        >
+          Jogar novamente
+        </button>
       </div>
     );
   }
@@ -79,6 +92,9 @@ class FeedBack extends Component {
 
 FeedBack.propTypes = {
   email: PropTypes.string.isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func,
+  }).isRequired,
   name: PropTypes.string.isRequired,
 };
 
