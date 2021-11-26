@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Header from '../components/Header';
 import ProgressBar from '../components/ProgressBar';
+import setInitialPlayer from '../helpers/setInitialPlayer';
 import '../assets/css/triviaScreen.css';
 
 class TriviaScreen extends Component {
@@ -28,7 +29,7 @@ class TriviaScreen extends Component {
 
   componentDidMount() {
     this.fetchTriviaApi();
-    this.setInitialPlayer();
+    setInitialPlayer();
   }
 
   componentDidUpdate(_prevProps, prevState) {
@@ -45,18 +46,6 @@ class TriviaScreen extends Component {
     if (prevState.assertions !== assertions) {
       this.setPlayerInfo();
     }
-  }
-
-  setInitialPlayer() {
-    const state = {
-      player: {
-        name: '',
-        assertions: 0,
-        score: 0,
-        gravatarEmail: '',
-      },
-    };
-    localStorage.setItem('state', JSON.stringify(state));
   }
 
   setPlayerInfo() {
