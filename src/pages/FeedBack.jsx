@@ -9,21 +9,40 @@ class FeedBack extends Component {
     this.state = {
       getHash: '',
       score: 0,
+      assertions: 0,
+      message: '',
     };
     this.fetchGravatarApi = this.fetchGravatarApi.bind(this);
-    this.getScore = this.getScore.bind(this);
+    this.getPlayer = this.getPlayer.bind(this);
+    this.messageAssertion = this.messageAssertion.bind(this);
   }
 
   componentDidMount() {
     const { email } = this.props;
     this.fetchGravatarApi(email);
-    this.getScore();
+    this.getPlayer();
   }
 
-  getScore() {
+  getPlayer() {
     const obejectState = JSON.parse(localStorage.getItem('state'));
-    const { score } = obejectState.player;
-    this.setState({ score });
+    const { score, assertions } = obejectState.player;
+    console.log(score, assertions);
+    this.setState({
+      score,
+      assertions,
+    });
+    this.messageAssertion(assertions);
+  }
+
+  messageAssertion(assertions) {
+    const THREE = 3;
+
+    if (assertions < THREE) {
+      this.setState({ message: 'Podia ser melhor...' });
+    }
+    if (assertions >= THREE) {
+      this.setState({ message: 'Mandou bem!' });
+    }
   }
 
   fetchGravatarApi(email) {
@@ -35,19 +54,25 @@ class FeedBack extends Component {
 
   render() {
     const { name } = this.props;
-    const { getHash, score } = this.state;
+    const { getHash, score, message, assertions } = this.state;
 
     return (
-      <header>
-        <h3 data-testid="feedback-text">Você está na página de Feedback</h3>
-        <img
-          src={ getHash }
-          alt="Foto de perfil do usuário"
-          data-testid="header-profile-picture"
-        />
-        <p data-testid="header-player-name">{ name }</p>
-        <p data-testid="header-score">{ score }</p>
-      </header>
+      <div>
+        <header>
+          <h3 data-testid="feedback-text">{ message }</h3>
+          <img
+            src={ getHash }
+            alt="Foto de perfil do usuário"
+            data-testid="header-profile-picture"
+          />
+          <p data-testid="header-player-name">{ name }</p>
+          <p data-testid="header-score">{ score }</p>
+        </header>
+        <section>
+          <p data-testid="feedback-total-score">{ score }</p>
+          <p data-testid="feedback-total-question">{ assertions }</p>
+        </section>
+      </div>
     );
   }
 }
