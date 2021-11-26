@@ -1,5 +1,5 @@
-import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Header from '../components/Header';
 import ProgressBar from '../components/ProgressBar';
@@ -8,7 +8,6 @@ import '../assets/css/triviaScreen.css';
 class TriviaScreen extends Component {
   constructor() {
     super();
-
     this.state = {
       triviaQuestions: [],
       answers: [],
@@ -18,7 +17,6 @@ class TriviaScreen extends Component {
       assertions: 0,
       score: 0,
     };
-
     this.fetchTriviaApi = this.fetchTriviaApi.bind(this);
     this.checkQuestions = this.checkQuestions.bind(this);
     this.disableAnswers = this.disableAnswers.bind(this);
